@@ -1,0 +1,37 @@
+apiVersion: k0sctl.k0sproject.io/v1beta1
+kind: Cluster
+metadata:
+  name: k0s-cluster
+spec:
+  k0s:
+    config:
+      spec:
+        extensions:
+          helm:
+            repositories:
+            - name: openebs-internal
+              url: https://openebs.github.io/charts
+            - name: metallb
+              url: https://metallb.github.io/metallb
+            - name: traefik
+              url: https://traefik.github.io/charts
+            charts:
+            - name: openebs
+              chartname: openebs-internal/openebs
+              version: "3.9.0"
+              namespace: openebs-system
+              order: 1
+              values: |
+                localprovisioner:
+                  hostpathClass:
+                    enabled: true
+                    isDefaultClass: true
+            - name: metallb
+              chartname: metallb/metallb
+              namespace: metallb-system
+              order: 2
+            - name: traefik
+              chartname: traefik/traefik
+              order: 3
+              version: "20.5.3"
+              namespace: traefik-system
