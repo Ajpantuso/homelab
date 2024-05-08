@@ -5,5 +5,9 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-  - port: 443
-    targetPort: 443
+  - name: https
+    port: 443
+    targetPort: https
+  - name: bio
+    port: 4433
+    targetPort: bio

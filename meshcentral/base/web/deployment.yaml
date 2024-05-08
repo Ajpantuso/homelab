@@ -20,7 +20,10 @@ spec:
             memory: "256Mi"
             cpu: "1000m"
         ports:
-        - containerPort: 443
+        - name: https
+          containerPort: 443
+        - name: bio
+          containerPort: 4433
       volumes:
       - name: config
         configMap:
