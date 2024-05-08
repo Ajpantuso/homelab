@@ -10,6 +10,8 @@ spec:
       - name: web
         image: web
         volumeMounts:
+        - name: data
+          mountPath: /opt/meshcentral/meshcentral-data
         - name: config
           mountPath: /opt/meshcentral/meshcentral-data/config.json
           subPath: config.json
@@ -18,8 +20,11 @@ spec:
             memory: "256Mi"
             cpu: "1000m"
         ports:
-        - containerPort: 4430
+        - containerPort: 443
       volumes:
       - name: config
         configMap:
           name: meshcentral-web
+      - name: data
+        persistentVolumeClaim:
+          claimName: web

@@ -1,7 +1,7 @@
 [tools]
 "go:github.com/coreos/butane/internal" = "v0.20.0"
 kustomize = "5.4.1"
-k0sctl = "0.17.5"
+k0sctl = "0.17.7"
 "cargo:coreos-installer" = "latest"
 pre-commit = "latest"
 flux2 = "latest"
