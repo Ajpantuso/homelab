@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  selector:
+  template:
+    spec:
+      containers:
+      - name: web
+        image: web
+        volumeMounts:
+        - name: config
+          mountPath: /opt/meshcentral/meshcentral-data/config.json
+          subPath: config.json
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 4430
+      volumes:
+      - name: config
+        configMap:
+          name: meshcentral-web

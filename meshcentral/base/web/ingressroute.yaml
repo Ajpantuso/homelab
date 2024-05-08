@@ -1,0 +1,13 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: web
+spec:
+  entryPoints:
+  - websecure
+  routes:
+    - match: PathPrefix(`/meshcentral`)
+      kind: Rule
+      services:
+      - name: meshcentral-web
+        port: 443

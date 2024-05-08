@@ -1,0 +1,15 @@
+{
+    "settings": {
+        "Cert": "lab.ajphome.com",
+        "Port": 4430,
+        "AliasPort": 443,
+        "RedirPort": 800,
+        "TlsOffload": "lab.ajphome.com"
+    },
+    "domains": {
+        "": {
+            "certUrl": "https://lab.ajphome.com:443/",
+            "agentConfig": [ "webSocketMaskOverride=1" ]
+        }
+    }
+}

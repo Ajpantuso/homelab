@@ -4,6 +4,7 @@ kustomize = "5.4.1"
 k0sctl = "0.17.5"
 "cargo:coreos-installer" = "latest"
 pre-commit = "latest"
+flux2 = "latest"
 
 [env]
 CONTAINER_ENGINE="docker"
