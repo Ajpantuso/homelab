@@ -4,7 +4,7 @@ kustomize = "5.4.1"
 k0sctl = "0.17.7"
 "cargo:coreos-installer" = "latest"
 pre-commit = "latest"
-flux2 = "latest"
+kubectl = "latest"
 
 [env]
 CONTAINER_ENGINE="docker"
@@ -22,13 +22,23 @@ COREOS_ISO_PATH=""
 COREOS_ISO_OUTPUT="out.iso"
 KUBECONFIG="{{ env.K0SCTL_KUBECONFIG }}"
 
-[tasks."generate:k0s"]
+[tasks."k0s:apply"]
+run = "k0sctl apply -c ${K0SCTL_CONFIG_OUTPUT}"
+depends = ["generate:baremetal"]
+
+[tasks."k0s:reset"]
+run = "k0sctl reset --force -c ${K0SCTL_CONFIG_OUTPUT}"
+depends = ["generate:baremetal"]
+
+[tasks."k0s:config"]
 run = """
-    k0sctl init --k0s \
-        --user ${K0SCTL_USERNAME} \
-        -i ${K0SCTL_IDENTITY_PATH} \
-        ${K0SCTL_HOSTS} > ${K0SCTL_BASE_CONFIG_PATH}
+    #! /usr/bin/env bash
+    mkdir -p $(dirname ${K0SCTL_KUBECONFIG})
+    k0sctl kubeconfig -c ${K0SCTL_CONFIG_OUTPUT} > ${K0SCTL_KUBECONFIG}
     """
+
+[tasks."flux:apply"]
+run = "kubectl apply -k flux"
 
 [tasks."generate:baremetal"]
 run = """
@@ -38,26 +48,12 @@ run = """
     """
 depends = ["generate:k0s"]
 
-[tasks."generate:ignition"]
+[tasks."generate:k0s"]
 run = """
-    #! /usr/bin/env bash
-    mkdir -p $(dirname ${K0S_IGNITION_PATH})
-    internal \
-    --pretty --strict \
-    --files-dir ${BUTANE_FILES_DIR} \
-    < ${K0S_BUTANE_PATH} \
-    > ${K0S_IGNITION_PATH}
-    """
-
-[tasks."k0s:apply"]
-run = "k0sctl apply -c ${K0SCTL_CONFIG_OUTPUT}"
-depends = ["generate:baremetal"]
-
-[tasks."k0s:config"]
-run = """
-    #! /usr/bin/env bash
-    mkdir -p $(dirname ${K0SCTL_KUBECONFIG})
-    k0sctl kubeconfig -c ${K0SCTL_CONFIG_OUTPUT} > ${K0SCTL_KUBECONFIG}
+    k0sctl init --k0s \
+        --user ${K0SCTL_USERNAME} \
+        -i ${K0SCTL_IDENTITY_PATH} \
+        ${K0SCTL_HOSTS} > ${K0SCTL_BASE_CONFIG_PATH}
     """
 
 [tasks."generate:iso"]
@@ -71,5 +67,13 @@ run = """
     """
 depends = ["generate:ignition"]
 
-[tasks."build:image:meshcommander"]
-run = "${CONTAINER_ENGINE} build meshcommander/container"
+[tasks."generate:ignition"]
+run = """
+    #! /usr/bin/env bash
+    mkdir -p $(dirname ${K0S_IGNITION_PATH})
+    internal \
+    --pretty --strict \
+    --files-dir ${BUTANE_FILES_DIR} \
+    < ${K0S_BUTANE_PATH} \
+    > ${K0S_IGNITION_PATH}
+    """
