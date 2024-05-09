@@ -1,12 +1,12 @@
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: grafana
+  name: prometheus
 spec:
   entryPoints:
   - web
   routes:
-  - match: Host(`grafana.ajphome.com`)
+  - match: Host(`prometheus.ajphome.com`)
     kind: Rule
     services:
     - name: kube-prometheus-stack-prometheus
