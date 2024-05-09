@@ -17,6 +17,8 @@ spec:
               url: https://traefik.github.io/charts
             - name: fluxcd-community
               url: https://fluxcd-community.github.io/helm-charts
+            - name: prometheus-community
+              url: https://prometheus-community.github.io/helm-charts
             charts:
             - name: openebs
               chartname: openebs-internal/openebs
@@ -42,3 +44,10 @@ spec:
               order: 3
               version: "20.5.3"
               namespace: traefik-system
+            - name: kube-prometheus-stack
+              chartname: prometheus-community/kube-prometheus-stack
+              order: 4
+              namespace: monitoring
+              values: |
+                alertmanager:
+                  enabled: false
