@@ -44,4 +44,4 @@ spec:
           claimName: assets
       - name: server
         configMap:
-        - name: server
+          name: server
