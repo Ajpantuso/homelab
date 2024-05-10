@@ -10,6 +10,7 @@ labels:
     app.kubernetes.io/component: server
 resources:
 - deployment.yaml
-- service.yaml
+- server-tcp.service.yaml
+- server-udp.service.yaml
 - assets.pvc.yaml
 - config.pvc.yaml
