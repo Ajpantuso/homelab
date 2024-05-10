@@ -10,11 +10,7 @@ spec:
     port: 69
     targetPort: tftp
     protocol: UDP
-  - name: start
-    port: 64001
-    targetPort: start
-    protocol: UDP
-  - name: end
-    port: 64002
-    targetPort: end
+  - name: ephemeral
+    port: 64000
+    targetPort: ephemeral
     protocol: UDP

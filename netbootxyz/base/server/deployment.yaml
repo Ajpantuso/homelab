@@ -11,7 +11,7 @@ spec:
         image: server
         env:
         - name: TFTPD_OPTS
-          value: "--port-range 64001:64002"
+          value: -R 64000:64000
         volumeMounts:
         - name: config
           mountPath: /config
@@ -25,11 +25,8 @@ spec:
         - name: tftp
           containerPort: 69
           protocol: UDP
-        - name: start
-          containerPort: 64001
-          protocol: UDP
-        - name: end
-          containerPort: 64002
+        - name: ephemeral
+          containerPort: 64000
           protocol: UDP
         - name: assets
           containerPort: 80
