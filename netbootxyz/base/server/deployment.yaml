@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server
+spec:
+  selector:
+  template:
+    spec:
+      containers:
+      - name: server
+        image: server
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        - name: assets
+          mountPath: /assets
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        ports:
+        - name: tftp
+          containerPort: 69
+        - name: assets
+          containerPort: 80
+        - name: web
+          containerPort: 3000
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: config
+      - name: assets
+        persistentVolumeClaim:
+          claimName: assets

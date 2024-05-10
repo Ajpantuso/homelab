@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: server
+spec:
+  type: LoadBalancer
+  ports:
+  - name: tftp
+    port: 69
+    targetPort: tftp
+    protocol: UDP
+  - name: web
+    port: 3000
+    targetPort: web
+  - name: assets
+    port: 80
+    targetPort: assets
