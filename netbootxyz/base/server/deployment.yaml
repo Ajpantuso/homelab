@@ -6,6 +6,7 @@ spec:
   selector:
   template:
     spec:
+      hostNetwork: true
       containers:
       - name: server
         image: server

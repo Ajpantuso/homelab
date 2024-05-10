@@ -6,6 +6,6 @@ spec:
   type: LoadBalancer
   ports:
   - name: tftp
-    port: 8069
+    port: 69
     targetPort: tftp
     protocol: UDP
