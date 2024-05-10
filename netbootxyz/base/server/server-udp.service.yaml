@@ -4,6 +4,7 @@ metadata:
   name: server-udp
 spec:
   type: LoadBalancer
+  externalTrafficPolicy: Local
   ports:
   - name: tftp
     port: 69
