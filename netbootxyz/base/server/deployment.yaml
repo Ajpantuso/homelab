@@ -11,15 +11,12 @@ spec:
         image: server
         env:
         - name: TFTPD_OPTS
-          value: -R 64000:64000
+          value: --port-range 64001:64002
         volumeMounts:
         - name: config
           mountPath: /config
         - name: assets
           mountPath: /assets
-        - name: server
-          mountPath: /etc/sysctl.conf
-          subPath: sysctl.conf
         resources:
           limits:
             memory: "512Mi"
@@ -28,8 +25,11 @@ spec:
         - name: tftp
           containerPort: 69
           protocol: UDP
-        - name: ephemeral
-          containerPort: 64000
+        - name: tid-start
+          containerPort: 64001
+          protocol: UDP
+        - name: tid-end
+          containerPort: 64002
           protocol: UDP
         - name: assets
           containerPort: 80
@@ -42,6 +42,3 @@ spec:
       - name: assets
         persistentVolumeClaim:
           claimName: assets
-      - name: server
-        configMap:
-          name: server

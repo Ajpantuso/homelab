@@ -10,7 +10,11 @@ spec:
     port: 69
     targetPort: tftp
     protocol: UDP
-  - name: ephemeral
-    port: 64000
-    targetPort: ephemeral
+  - name: tid-start
+    port: 64001
+    targetPort: tid-start
+    protocol: UDP
+  - name: tid-end
+    port: 64002
+    targetPort: tid-end
     protocol: UDP
