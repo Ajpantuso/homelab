@@ -10,11 +10,14 @@ spec:
     port: 69
     targetPort: tftp
     protocol: UDP
-  - name: tid-start
-    port: 64001
-    targetPort: tid-start
+  - name: tid-0
+    port: 8000
+    targetPort: tid-0
     protocol: UDP
-  - name: tid-end
-    port: 64002
-    targetPort: tid-end
+  - name: tid-1
+    port: 8001
+    targetPort: tid-1
+  - name: tid-2
+    port: 8002
+    targetPort: tid-2
     protocol: UDP
