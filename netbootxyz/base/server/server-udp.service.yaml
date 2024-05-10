@@ -9,3 +9,11 @@ spec:
     port: 69
     targetPort: tftp
     protocol: UDP
+  - name: start
+    port: 59000
+    targetPort: start
+    protocol: UDP
+  - name: end
+    port: 59001
+    targetPort: end
+    protocol: UDP

@@ -10,6 +10,9 @@ spec:
       containers:
       - name: server
         image: server
+        env:
+        - name: TFTPD_OPTS
+          value: --port-range 59000:59001
         volumeMounts:
         - name: config
           mountPath: /config
@@ -22,6 +25,12 @@ spec:
         ports:
         - name: tftp
           containerPort: 69
+          protocol: UDP
+        - name: start
+          containerPort: 59000
+          protocol: UDP
+        - name: end
+          containerPort: 59001
           protocol: UDP
         - name: assets
           containerPort: 80
