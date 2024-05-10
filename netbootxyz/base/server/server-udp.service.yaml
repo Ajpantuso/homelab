@@ -11,10 +11,10 @@ spec:
     targetPort: tftp
     protocol: UDP
   - name: start
-    port: 59000
+    port: 64001
     targetPort: start
     protocol: UDP
   - name: end
-    port: 59001
+    port: 64002
     targetPort: end
     protocol: UDP
