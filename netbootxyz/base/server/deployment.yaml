@@ -17,6 +17,9 @@ spec:
           mountPath: /config
         - name: assets
           mountPath: /assets
+        - name: server
+          mountPath: /etc/sysctl.conf
+          subPath: sysctl.conf
         resources:
           limits:
             memory: "512Mi"
@@ -39,3 +42,6 @@ spec:
       - name: assets
         persistentVolumeClaim:
           claimName: assets
+      - name: server
+        configMap:
+        - name: server

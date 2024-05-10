@@ -8,6 +8,10 @@ labels:
 - includeSelectors: true
   pairs:
     app.kubernetes.io/component: server
+configMapGenerator:
+  - name: server
+    files:
+    - sysctl.conf
 resources:
 - deployment.yaml
 - server-tcp.service.yaml
