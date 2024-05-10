@@ -21,6 +21,7 @@ spec:
         ports:
         - name: tftp
           containerPort: 69
+          protocol: UDP
         - name: assets
           containerPort: 80
         - name: web
