@@ -44,3 +44,32 @@ storage:
     contents:
       inline: |
         %wheel        ALL=(ALL)       NOPASSWD: ALL
+  - path: /etc/ansible/hosts
+    contents:
+      inline: |
+        [k0s]
+        localhost
+systemd:
+  units:
+  - name: ansible-pull.service
+    enabled: true
+    contents: |
+      [Unit]
+      Description=Runs Ansible Pull
+      Wants=ansible-pull.timer
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/bin/ansible-pull -U https://github.com/ajpantuso/homelab ansible/main.yaml
+      [Install]
+      WantedBy=multi-user.target
+  - name: ansible-pull.timer
+    enabled: true
+    contents: |
+      [Unit]
+      Description=Ansible Pull Timer
+      Requires=ansible-pull.service
+      [Timer]
+      Unit=ansible-pull.service
+      OnCalendar=00/2:01:00
+      [Install]
+      WantedBy=timers.target

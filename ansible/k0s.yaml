@@ -1,5 +1,5 @@
 ---
 - gather_facts: true
-  hosts: localhost
+  hosts: k0s
   roles:
   - role: common

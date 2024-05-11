@@ -12,4 +12,4 @@
 - Add persistence for grafana and prometheus
 - Add PVC backups
 - Add explicit requests for IP's in service annotations
-- Setup working PXE server (try again on RPi)
+- Setup working PXE server (try again on RPi with [cobbler](https://cobbler.readthedocs.io/en/latest/index.html))
