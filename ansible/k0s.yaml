@@ -1,0 +1,5 @@
+---
+- gather_facts: true
+  hosts: localhost
+  roles:
+  - role: common
