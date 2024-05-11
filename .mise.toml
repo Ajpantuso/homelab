@@ -11,7 +11,7 @@ CONTAINER_ENGINE="docker"
 BUTANE_FILES_DIR=""
 K0SCTL_USERNAME="admin"
 K0SCTL_IDENTITY_PATH="{{ [config_root, '.ssh', 'id_rsa'] | join_path }}"
-K0SCTL_BASE_CONFIG_PATH="{{ [config_root, 'config', 'base', 'k0s.Cluster.yaml'] | join_path }}"
+K0SCTL_BASE_CONFIG_PATH="{{ [config_root, 'config', 'k0s.Cluster.yaml'] | join_path }}"
 K0SCTL_CONFIG_OUTPUT="{{ [config_root, '.cache', 'k0sctl', 'config.yaml'] | join_path }}"
 K0SCTL_KUBECONFIG="{{ [config_root, '.cache', '.kube', 'config'] | join_path }}"
 K0SCTL_HOSTS=""
@@ -24,11 +24,11 @@ KUBECONFIG="{{ env.K0SCTL_KUBECONFIG }}"
 
 [tasks."k0s:apply"]
 run = "k0sctl apply -c ${K0SCTL_CONFIG_OUTPUT}"
-depends = ["generate:baremetal"]
+depends = ["generate:config"]
 
 [tasks."k0s:reset"]
 run = "k0sctl reset --force -c ${K0SCTL_CONFIG_OUTPUT}"
-depends = ["generate:baremetal"]
+depends = ["generate:config"]
 
 [tasks."k0s:config"]
 run = """
@@ -40,11 +40,11 @@ run = """
 [tasks."flux:apply"]
 run = "kubectl apply -k flux"
 
-[tasks."generate:baremetal"]
+[tasks."generate:config"]
 run = """
     #! /usr/bin/env bash
     mkdir -p $(dirname ${K0SCTL_CONFIG_OUTPUT})
-    kustomize build config/overlays/baremetal > ${K0SCTL_CONFIG_OUTPUT}
+    kustomize build config > ${K0SCTL_CONFIG_OUTPUT}
     """
 depends = ["generate:k0s"]
 

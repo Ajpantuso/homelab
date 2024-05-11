@@ -1,0 +1,8 @@
+---
+- name: Install udisks2
+  become: true
+  community.general.rpm_ostree_pkg:
+    name: udisks2
+    state: present
+  notify:
+  - Reboot Node

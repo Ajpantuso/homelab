@@ -1,0 +1,3 @@
+---
+- import_tasks: coreos.yaml
+  when: '"fedora-coreos" in ansible_proc_cmdline.ostree'
