@@ -11,15 +11,17 @@ CONTAINER_ENGINE="docker"
 BUTANE_FILES_DIR=""
 K0SCTL_USERNAME="admin"
 K0SCTL_IDENTITY_PATH="{{ [config_root, '.ssh', 'id_rsa'] | join_path }}"
-K0SCTL_BASE_CONFIG_PATH="{{ [config_root, 'config', 'k0s.Cluster.yaml'] | join_path }}"
+K0SCTL_BASE_CONFIG_PATH="{{ [config_root, 'k0s', 'k0s.Cluster.yaml'] | join_path }}"
 K0SCTL_CONFIG_OUTPUT="{{ [config_root, '.cache', 'k0sctl', 'config.yaml'] | join_path }}"
 K0SCTL_KUBECONFIG="{{ [config_root, '.cache', '.kube', 'config'] | join_path }}"
 K0SCTL_HOSTS=""
-K0S_BUTANE_PATH="{{ [config_root, 'config', 'ignition', 'k0s.bu'] | join_path }}"
+K0S_BUTANE_PATH="{{ [config_root, 'ignition', 'k0s.bu'] | join_path }}"
 K0S_IGNITION_PATH="{{ [config_root, '.cache', 'ignition', 'k0s.ign'] | join_path }}"
 COREOS_DEST_DEV="/dev/sda"
 COREOS_ISO_PATH=""
 COREOS_ISO_OUTPUT="out.iso"
+COREOS_INITRAMFS_PATH=""
+COREOS_INITRAMFS_OUTPUT="k0s-live-initramfs.x86_64.img"
 KUBECONFIG="{{ env.K0SCTL_KUBECONFIG }}"
 
 [tasks."k0s:apply"]
@@ -44,7 +46,7 @@ run = "kubectl apply -k flux"
 run = """
     #! /usr/bin/env bash
     mkdir -p $(dirname ${K0SCTL_CONFIG_OUTPUT})
-    kustomize build config > ${K0SCTL_CONFIG_OUTPUT}
+    kustomize build k0s > ${K0SCTL_CONFIG_OUTPUT}
     """
 depends = ["generate:k0s"]
 
@@ -55,6 +57,17 @@ run = """
         -i ${K0SCTL_IDENTITY_PATH} \
         ${K0SCTL_HOSTS} > ${K0SCTL_BASE_CONFIG_PATH}
     """
+
+[tasks."generate:pxe"]
+run = """
+    coreos-installer pxe customize \
+        --dest-device ${COREOS_DEST_DEV} \
+        --dest-ignition ${K0S_IGNITION_PATH} \
+        --dest-console ttyS0,115200n8 \
+        --dest-console tty0 \
+        -o ${COREOS_INITRAMFS_OUTPUT} ${COREOS_INITRAMFS_PATH}
+    """
+depends = ["generate:ignition"]
 
 [tasks."generate:iso"]
 run = """

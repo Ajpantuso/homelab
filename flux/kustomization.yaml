@@ -6,4 +6,3 @@ resources:
 - metallb.kustomization.yaml
 - meshcentral.kustomization.yaml
 - monitoring.kustomization.yaml
-- netbootxyz.kustomization.yaml

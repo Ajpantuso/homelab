@@ -51,15 +51,36 @@ storage:
         localhost
 systemd:
   units:
+  - name: rpm-ostree-install-extra.service
+    enabled: true
+    contents: |
+      [Unit]
+      Description=Layer extra rpms
+      Wants=network-online.target
+      After=network-online.target
+      Before=zincati.service
+      ConditionPathExists=!/var/lib/%N.stamp
+
+      [Service]
+      Type=oneshot
+      RemainAfterExit=yes
+      ExecStart=/usr/bin/rpm-ostree install -y --allow-inactive udisks2 ansible
+      ExecStart=/bin/touch /var/lib/%N.stamp
+      ExecStart=/bin/systemctl --no-block reboot
+
+      [Install]
+      WantedBy=multi-user.target
   - name: ansible-pull.service
     enabled: true
     contents: |
       [Unit]
       Description=Runs Ansible Pull
       Wants=ansible-pull.timer
+
       [Service]
       Type=oneshot
       ExecStart=/usr/bin/ansible-pull -U https://github.com/ajpantuso/homelab ansible/main.yaml
+
       [Install]
       WantedBy=multi-user.target
   - name: ansible-pull.timer
@@ -68,8 +89,10 @@ systemd:
       [Unit]
       Description=Ansible Pull Timer
       Requires=ansible-pull.service
+
       [Timer]
       Unit=ansible-pull.service
       OnCalendar=00/2:01:00
+
       [Install]
       WantedBy=timers.target
