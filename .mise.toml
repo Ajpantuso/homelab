@@ -15,14 +15,23 @@ K0SCTL_BASE_CONFIG_PATH="{{ [config_root, 'k0s', 'k0s.Cluster.yaml'] | join_path
 K0SCTL_CONFIG_OUTPUT="{{ [config_root, '.cache', 'k0sctl', 'config.yaml'] | join_path }}"
 K0SCTL_KUBECONFIG="{{ [config_root, '.cache', '.kube', 'config'] | join_path }}"
 K0SCTL_HOSTS=""
+KUBECONFIG="{{ env.K0SCTL_KUBECONFIG }}"
 K0S_BUTANE_PATH="{{ [config_root, 'ignition', 'k0s.bu'] | join_path }}"
 K0S_IGNITION_PATH="{{ [config_root, '.cache', 'ignition', 'k0s.ign'] | join_path }}"
 COREOS_DEST_DEV="/dev/sda"
 COREOS_ISO_PATH=""
 COREOS_ISO_OUTPUT="out.iso"
-COREOS_INITRAMFS_PATH=""
-COREOS_INITRAMFS_OUTPUT="k0s-live-initramfs.x86_64.img"
-KUBECONFIG="{{ env.K0SCTL_KUBECONFIG }}"
+COREOS_VERSION="40.20240416.3.1"
+TARGET_SYSTEM_ARCH="x86_64"
+COREOS_DOWNLOAD_URL="https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/{{ env.COREOS_VERSION }}/{{ env.TARGET_SYSTEM_ARCH }}"
+COREOS_KERNEL_URL="{{ env.COREOS_DOWNLOAD_URL }}/fedora-coreos-{{ env.COREOS_VERSION }}-live-kernel-{{ env.TARGET_SYSTEM_ARCH }}"
+COREOS_INITRAMFS_URL="{{ env.COREOS_DOWNLOAD_URL }}/fedora-coreos-{{ env.COREOS_VERSION }}-live-initramfs.{{ env.TARGET_SYSTEM_ARCH }}.img"
+COREOS_ROOTFS_URL="{{ env.COREOS_DOWNLOAD_URL }}/fedora-coreos-{{ env.COREOS_VERSION }}-live-rootfs.{{ env.TARGET_SYSTEM_ARCH }}.img"
+PXE_ROOT_DIR="{{ [config_root, 'pxe', 'os'] | join_path }}"
+PXE_COREOS_DIR="{{ [env.PXE_ROOT_DIR, 'fedora', 'coreos', env.COREOS_VERSION, env.TARGET_SYSTEM_ARCH] | join_path }}"
+K0S_KERNEL_OUTPUT="{{ [ env.PXE_COREOS_DIR, 'k0s-live-kernel'] | join_path }}"
+K0S_INITRAMFS_OUTPUT="{{ [ env.PXE_COREOS_DIR, 'k0s-live-initramfs.img'] | join_path }}"
+K0S_ROOTFS_OUTPUT="{{ [ env.PXE_COREOS_DIR, 'k0s-live-rootfs.img'] | join_path }}"
 
 [tasks."k0s:apply"]
 run = "k0sctl apply -c ${K0SCTL_CONFIG_OUTPUT}"
@@ -58,14 +67,42 @@ run = """
         ${K0SCTL_HOSTS} > ${K0SCTL_BASE_CONFIG_PATH}
     """
 
+[tasks."apply:pxe"]
+run="""
+    #!/usr/bin/env bash
+
+    POD=$(kubectl get -n pxe po -l app.kubernetes.io/component=web -o name | head -n1 | cut -f2 -d'/')
+    kubectl -n pxe cp ${PXE_ROOT_DIR}.tar.gz ${POD}:/opt/app-root/src
+    kubectl exec -n pxe ${POD} -- tar -C /opt/app-root/src -xvf /opt/app-root/src/$(basename ${PXE_ROOT_DIR}).tar.gz
+    kubectl exec -n pxe ${POD} -- rm /opt/app-root/src/$(basename ${PXE_ROOT_DIR}).tar.gz
+"""
+# depends = [ "generate:pxe" ]
+
 [tasks."generate:pxe"]
 run = """
+    #!/usr/bin/env bash
+
+    curl -o ${K0S_KERNEL_OUTPUT} ${COREOS_KERNEL_URL}
+    curl -o ${K0S_ROOTFS_OUTPUT} ${COREOS_ROOTFS_URL}
+
+    if [ -f ${K0S_INITRAMFS_OUTPUT} ]; then
+        rm ${K0S_INITRAMFS_OUTPUT}
+    fi
+
+    curl -o temp.initramfs ${COREOS_INITRAMFS_URL}
+    mkdir -p ${PXE_COREOS_DIR}
     coreos-installer pxe customize \
         --dest-device ${COREOS_DEST_DEV} \
         --dest-ignition ${K0S_IGNITION_PATH} \
         --dest-console ttyS0,115200n8 \
         --dest-console tty0 \
-        -o ${COREOS_INITRAMFS_OUTPUT} ${COREOS_INITRAMFS_PATH}
+        -o ${K0S_INITRAMFS_OUTPUT} temp.initramfs
+
+    chmod 0644 ${K0S_INITRAMFS_OUTPUT}
+
+    tar -C $(dirname ${PXE_ROOT_DIR}) -czf ${PXE_ROOT_DIR}.tar.gz $(basename ${PXE_ROOT_DIR})
+
+    rm temp.initramfs
     """
 depends = ["generate:ignition"]
 
