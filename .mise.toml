@@ -76,7 +76,7 @@ run="""
     kubectl exec -n pxe ${POD} -- tar -C /opt/app-root/src -xvf /opt/app-root/src/$(basename ${PXE_ROOT_DIR}).tar.gz
     kubectl exec -n pxe ${POD} -- rm /opt/app-root/src/$(basename ${PXE_ROOT_DIR}).tar.gz
 """
-# depends = [ "generate:pxe" ]
+depends = [ "generate:pxe" ]
 
 [tasks."generate:pxe"]
 run = """

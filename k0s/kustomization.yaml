@@ -4,15 +4,3 @@ resources:
 - k0s.Cluster.yaml
 patches:
 - path: k0s.Cluster.patch.yaml
-- target:
-    group: k0sctl.k0sproject.io
-    version: v1beta1
-    kind: Cluster
-    name: k0s-cluster
-  patch: |-
-    - op: replace
-      path: /spec/hosts/0/noTaints
-      value: true
-    - op: replace
-      path: /spec/hosts/0/role
-      value: controller+worker

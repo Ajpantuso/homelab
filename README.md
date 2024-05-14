@@ -2,7 +2,7 @@
 
 - Migrate from FOG to custom PXE server https://github.com/boliu83/ipxe-boot-server
 - move files to common directory for butane and ansible to pull from
-- ansible pull should wait on resolv service
+- Configure k0s to use local containerd if possible
 - Add probes to services
 - Add requests/limits to services
 - Add selinux context to services
