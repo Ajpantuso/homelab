@@ -6,6 +6,21 @@ Load `nvme-tcp` kernel module and add hugepage space
 
 ```yaml
 storage:
+  disks:
+  - device: /dev/sda
+    wipe_table: true
+  # drop all of this configuration
+  #   partitions:
+  #   - size_mib: 0
+  #     start_mib: 0
+  #     wipe_partition_entry: true
+  #     label: ebs
+  # filesystems:
+  # - path: /var/openebs/local
+  #   device: /dev/disk/by-partlabel/ebs
+  #   format: ext4
+  #   wipe_filesystem: true
+  #   with_mount_unit: true
   files:
   - path: /etc/modules-load.d/nvme-tcp.conf
     contents:
