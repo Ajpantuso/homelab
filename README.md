@@ -1,6 +1,8 @@
 # TODO
 
 - Migrate from FOG to custom PXE server https://github.com/boliu83/ipxe-boot-server
+- move files to common directory for butane and ansible to pull from
+- ansible pull should wait on resolv service
 - Add probes to services
 - Add requests/limits to services
 - Add selinux context to services
@@ -8,8 +10,7 @@
 - Secure Grafana and Prometheus (TLS + passwords)
 - Add persistence for grafana and prometheus
 - Add PVC backups
-- https://github.com/intel/intel-device-plugins-for-kubernetes/blob/main/cmd/gpu_plugin/README.md
-- https://github.com/intel/intel-device-plugins-for-kubernetes/tree/main/cmd/gpu_plugin#testing-and-demos
+- Add replicated storage (See [Replicated Storage Poc](docs/replicated-storage-poc.md))
 
 ## IXPE Boot Parameters
 
@@ -19,3 +20,10 @@ kernel ${BASEURL}/k0s-live-kernel initrd=main ignition.firstboot ignition.platfo
 initrd --name main ${BASEURL}/k0s-live-initramfs.img
 boot
 ```
+
+## References
+
+- https://docs.fedoraproject.org/en-US/fedora-coreos/
+- https://coreos.github.io/butane/
+- https://github.com/intel/intel-device-plugins-for-kubernetes/blob/main/cmd/gpu_plugin/README.md
+- https://github.com/intel/intel-device-plugins-for-kubernetes/tree/main/cmd/gpu_plugin#testing-and-demos

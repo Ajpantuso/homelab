@@ -89,6 +89,7 @@ systemd:
       [Unit]
       Description=Ansible Pull Timer
       Requires=ansible-pull.service
+      After=network.target nss-lookup.target
 
       [Timer]
       Unit=ansible-pull.service
