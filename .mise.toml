@@ -32,6 +32,8 @@ PXE_COREOS_DIR="{{ [env.PXE_ROOT_DIR, 'fedora', 'coreos', env.COREOS_VERSION, en
 K0S_KERNEL_OUTPUT="{{ [ env.PXE_COREOS_DIR, 'k0s-live-kernel'] | join_path }}"
 K0S_INITRAMFS_OUTPUT="{{ [ env.PXE_COREOS_DIR, 'k0s-live-initramfs.img'] | join_path }}"
 K0S_ROOTFS_OUTPUT="{{ [ env.PXE_COREOS_DIR, 'k0s-live-rootfs.img'] | join_path }}"
+PXE_IGNITION_PATH="{{ [config_root, '.cache', 'ignition', 'pxe.ign'] | join_path }}"
+PXE_BUTANE_PATH="{{ [config_root, 'ignition', 'pxe.bu'] | join_path }}"
 
 [tasks."k0s:apply"]
 run = "k0sctl apply -c ${K0SCTL_CONFIG_OUTPUT}"
@@ -76,9 +78,9 @@ run="""
     kubectl exec -n pxe ${POD} -- tar -C /opt/app-root/src -xvf /opt/app-root/src/$(basename ${PXE_ROOT_DIR}).tar.gz
     kubectl exec -n pxe ${POD} -- rm /opt/app-root/src/$(basename ${PXE_ROOT_DIR}).tar.gz
 """
-depends = [ "generate:pxe" ]
+depends = [ "k0s:generate:pxe" ]
 
-[tasks."generate:pxe"]
+[tasks."k0s:generate:pxe"]
 run = """
     #!/usr/bin/env bash
 
@@ -104,9 +106,9 @@ run = """
 
     rm temp.initramfs
     """
-depends = ["generate:ignition"]
+depends = ["k0s:generate:ignition"]
 
-[tasks."generate:iso"]
+[tasks."k0s:generate:iso"]
 run = """
     coreos-installer iso customize \
         --dest-device ${COREOS_DEST_DEV} \
@@ -115,9 +117,9 @@ run = """
         --dest-console tty0 \
         -o ${COREOS_ISO_OUTPUT} ${COREOS_ISO_PATH}
     """
-depends = ["generate:ignition"]
+depends = ["k0s:generate:ignition"]
 
-[tasks."generate:ignition"]
+[tasks."k0s:generate:ignition"]
 run = """
     #! /usr/bin/env bash
     mkdir -p $(dirname ${K0S_IGNITION_PATH})
@@ -126,4 +128,15 @@ run = """
     --files-dir ${BUTANE_FILES_DIR} \
     < ${K0S_BUTANE_PATH} \
     > ${K0S_IGNITION_PATH}
+    """
+
+[tasks."pxe:generate:ignition"]
+run = """
+    #! /usr/bin/env bash
+    mkdir -p $(dirname ${PXE_IGNITION_PATH})
+    internal \
+    --pretty --strict \
+    --files-dir ${BUTANE_FILES_DIR} \
+    < ${PXE_BUTANE_PATH} \
+    > ${PXE_IGNITION_PATH}
     """

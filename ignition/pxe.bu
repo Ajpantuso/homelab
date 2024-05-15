@@ -10,20 +10,8 @@ passwd:
     - wheel
     shell: /bin/bash
 storage:
-  disks:
-  - device: /dev/sda
-    wipe_table: true
-    partitions:
-    - size_mib: 0
-      start_mib: 0
-      wipe_partition_entry: true
-      label: ebs
-  filesystems:
-  - path: /var/openebs/local
-    device: /dev/disk/by-partlabel/ebs
-    format: ext4
-    wipe_filesystem: true
-    with_mount_unit: true
+  directories:
+  - path: /tftpboot
   files:
   - path: /etc/zincati/config.d/51-rollout-wariness.toml
     contents:
@@ -47,8 +35,17 @@ storage:
   - path: /etc/ansible/hosts
     contents:
       inline: |
-        [k0s]
+        [pxe]
         localhost
+  - path: /tftpboot/ipxe-x86_64.efi
+    contents:
+      local: ipxe-x86_64.efi
+  - path: /tftpboot/undionly.kpxe
+    contents:
+      local: undionly.kpxe
+  - path: /tftpboot/menu/boot.ipxe
+    contents:
+      local: boot.ipxe
 systemd:
   units:
   - name: rpm-ostree-install-extra.service
@@ -64,7 +61,7 @@ systemd:
       [Service]
       Type=oneshot
       RemainAfterExit=yes
-      ExecStart=/usr/bin/rpm-ostree install -y --allow-inactive udisks2 ansible
+      ExecStart=/usr/bin/rpm-ostree install -y --allow-inactive udisks2 ansible tftp-server
       ExecStart=/bin/touch /var/lib/%N.stamp
       ExecStart=/bin/systemctl --no-block reboot
 
