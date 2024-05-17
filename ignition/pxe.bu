@@ -9,88 +9,61 @@ passwd:
     groups:
     - wheel
     shell: /bin/bash
+  - name: nginx
+    system: true
 storage:
   directories:
-  - path: /tftpboot
+  - path: /srv/www
+    user:
+      name: labadm
+    group:
+      name: labadm
   files:
   - path: /etc/zincati/config.d/51-rollout-wariness.toml
     contents:
-      inline: |
-        [identity]
-        rollout_wariness = 0.5
+      local: overlays/coreos/etc/zincati/config.d/51-rollout-wariness.toml
   - path: /etc/zincati/config.d/55-updates-strategy.toml
     contents:
-      inline: |
-        [updates]
-        strategy = "periodic"
-        [[updates.periodic.window]]
-        days = [ "Sat", "Sun" ]
-        start_time = "22:30"
-        length_minutes = 60
+      local: overlays/coreos/etc/zincati/config.d/55-updates-strategy.toml
   - path: /etc/sudoers.d/01_wheel
     mode: 0440
     contents:
-      inline: |
-        %wheel        ALL=(ALL)       NOPASSWD: ALL
+      local: overlays/coreos/etc/sudoers.d/01_wheel
   - path: /etc/ansible/hosts
     contents:
-      inline: |
-        [pxe]
-        localhost
-  - path: /tftpboot/ipxe-x86_64.efi
+      local: overlays/pxe/etc/ansible/hosts
+  - path: /etc/nginx/nginx.conf
     contents:
-      local: ipxe-x86_64.efi
-  - path: /tftpboot/undionly.kpxe
+      local: overlays/pxe/etc/nginx/nginx.conf
+  - path: /var/lib/tftpboot/ipxe-x86_64.efi
     contents:
-      local: undionly.kpxe
-  - path: /tftpboot/menu/boot.ipxe
+      local: overlays/pxe/var/lib/tftpboot/ipxe-x86_64.efi
+  - path: /var/lib/tftpboot/undionly.kpxe
     contents:
-      local: boot.ipxe
+      local: overlays/pxe/var/lib/tftpboot/undionly.kpxe
+  - path: /var/lib/tftpboot/menu/boot.ipxe
+    contents:
+      local: overlays/pxe/var/lib/tftpboot/menu/boot.ipxe
 systemd:
   units:
   - name: rpm-ostree-install-extra.service
     enabled: true
-    contents: |
-      [Unit]
-      Description=Layer extra rpms
-      Wants=network-online.target
-      After=network-online.target
-      Before=zincati.service
-      ConditionPathExists=!/var/lib/%N.stamp
-
-      [Service]
-      Type=oneshot
-      RemainAfterExit=yes
-      ExecStart=/usr/bin/rpm-ostree install -y --allow-inactive udisks2 ansible tftp-server
-      ExecStart=/bin/touch /var/lib/%N.stamp
-      ExecStart=/bin/systemctl --no-block reboot
-
-      [Install]
-      WantedBy=multi-user.target
+    contents_local: overlays/pxe/etc/systemd/system/rpm-ostree-install-extra.service
+  - name: tftp.service
+    enabled: true
+    contents_local: overlays/pxe/etc/systemd/system/tftp.service
+  - name: tftp.socket
+    enabled: true
+    contents_local: overlays/pxe/etc/systemd/system/tftp.socket
+  - name: nginx-setup.service
+    enabled: true
+    contents_local: overlays/pxe/etc/systemd/system/nginx-setup.service
+  - name: nginx.service
+    enabled: true
+    contents_local: overlays/pxe/etc/systemd/system/nginx.service
   - name: ansible-pull.service
     enabled: true
-    contents: |
-      [Unit]
-      Description=Runs Ansible Pull
-      Wants=ansible-pull.timer
-
-      [Service]
-      Type=oneshot
-      ExecStart=/usr/bin/ansible-pull -U https://github.com/ajpantuso/homelab ansible/main.yaml
-
-      [Install]
-      WantedBy=multi-user.target
+    contents_local: overlays/coreos/etc/systemd/system/ansible-pull.service
   - name: ansible-pull.timer
     enabled: true
-    contents: |
-      [Unit]
-      Description=Ansible Pull Timer
-      Requires=ansible-pull.service
-      After=network.target nss-lookup.target
-
-      [Timer]
-      Unit=ansible-pull.service
-      OnCalendar=00/2:01:00
-
-      [Install]
-      WantedBy=timers.target
+    contents_local: overlays/coreos/etc/systemd/system/ansible-pull.timer

@@ -4,13 +4,14 @@
 
 ```bash
 RELEASE=40
+FCOSDISK=/dev/sdX #Update with attached sd card device id
+STREAM=stable
+
 mkdir -p /tmp/RPi4boot/boot/efi/
 sudo dnf install -y --downloadonly --release=$RELEASE --forcearch=aarch64 --destdir=/tmp/RPi4boot/ uboot-images-armv8 bcm283x-firmware bcm283x-overlays
 for rpm in /tmp/RPi4boot/*rpm; do rpm2cpio $rpm | sudo cpio -idv -D /tmp/RPi4boot/; done
 sudo mv /tmp/RPi4boot/usr/share/uboot/rpi_arm64/u-boot.bin /tmp/RPi4boot/boot/efi/rpi-u-boot.bin
-FCOSDISK=/dev/sdX #Update with attached sd card device id
-STREAM=stable
-sudo coreos-installer install -a aarch64 -s $STREAM -i config.ign --append-karg nomodeset $FCOSDISK
+sudo coreos-installer install -a aarch64 -s $STREAM -i ${PXE_IGNITION_PATH} --append-karg nomodeset $FCOSDISK
 FCOSEFIPARTITION=$(lsblk $FCOSDISK -J -oLABEL,PATH  | jq -r '.blockdevices[] | select(.label == "EFI-SYSTEM")'.path)
 mkdir /tmp/FCOSEFIpart
 sudo mount $FCOSEFIPARTITION /tmp/FCOSEFIpart

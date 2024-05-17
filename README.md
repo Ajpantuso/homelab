@@ -1,12 +1,9 @@
 # TODO
 
-- Migrate from FOG to custom PXE server https://github.com/boliu83/ipxe-boot-server
-- move files to common directory for butane and ansible to pull from
 - Configure k0s to use local containerd if possible
 - Add probes to services
 - Add requests/limits to services
 - Add selinux context to services
-- Setup RPi's with Fedora CoreOS https://docs.fedoraproject.org/en-US/fedora-coreos/provisioning-raspberry-pi4/
 - Secure Grafana and Prometheus (TLS + passwords)
 - Add persistence for grafana and prometheus
 - Add PVC backups
@@ -24,6 +21,8 @@ boot
 ## References
 
 - https://docs.fedoraproject.org/en-US/fedora-coreos/
+- https://docs.fedoraproject.org/en-US/fedora-coreos/provisioning-raspberry-pi4/
 - https://coreos.github.io/butane/
 - https://github.com/intel/intel-device-plugins-for-kubernetes/blob/main/cmd/gpu_plugin/README.md
 - https://github.com/intel/intel-device-plugins-for-kubernetes/tree/main/cmd/gpu_plugin#testing-and-demos
+- https://github.com/boliu83/ipxe-boot-server
