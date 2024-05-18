@@ -1,8 +1,5 @@
 # TODO
 
-- Add probes to services
-- Add requests/limits to services
-- Add selinux context to services
 - Secure Grafana and Prometheus (TLS + passwords)
 - Add persistence for grafana and prometheus
 - Add PVC backups
