@@ -1,6 +1,5 @@
 # TODO
 
-- Configure k0s to use local containerd if possible
 - Add probes to services
 - Add requests/limits to services
 - Add selinux context to services
@@ -9,14 +8,9 @@
 - Add PVC backups
 - Add replicated storage (See [Replicated Storage Poc](docs/replicated-storage-poc.md))
 
-## IXPE Boot Parameters
+## Architecture
 
-```bash
-set BASEURL http://pxe.ajphome.com/os/fedora/coreos/40.20240416.3.1/x86_64
-kernel ${BASEURL}/k0s-live-kernel initrd=main ignition.firstboot ignition.platform.id=metal coreos.live.rootfs_url=${BASEURL}/k0s-live-rootfs.img
-initrd --name main ${BASEURL}/k0s-live-initramfs.img
-boot
-```
+![homelab_architecture](docs/assets/homelab_high-level_architecture.png)
 
 ## References
 
