@@ -17,3 +17,4 @@
 - https://github.com/intel/intel-device-plugins-for-kubernetes/blob/main/cmd/gpu_plugin/README.md
 - https://github.com/intel/intel-device-plugins-for-kubernetes/tree/main/cmd/gpu_plugin#testing-and-demos
 - https://github.com/boliu83/ipxe-boot-server
+- https://meshcentral.com/docs/MeshCentral2UserGuide.pdf

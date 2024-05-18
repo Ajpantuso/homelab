@@ -37,7 +37,6 @@ spec:
             port: https
           initialDelaySeconds: 3
         securityContext:
-          runAsNonRoot: true
           readOnlyRootFilesystem: true
           allowPrivilegeEscalation: false
           capabilities:
@@ -51,6 +50,5 @@ spec:
         persistentVolumeClaim:
           claimName: web
       securityContext:
-        runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
