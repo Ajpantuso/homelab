@@ -3,4 +3,5 @@ kind: Kustomization
 resources:
 - grafana-tls.Certificate.yaml
 - grafana.ingressroute.yaml
+- prometheus-tls.Certificate.yaml
 - prometheus.ingressroute.yaml
