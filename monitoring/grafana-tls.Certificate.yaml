@@ -1,0 +1,11 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: grafana-tls
+spec:
+  dnsNames:
+  - grafana.ajphome.com
+  secretName: grafana-tls
+  issuerRef:
+    name: ca
+    kind: ClusterIssuer
