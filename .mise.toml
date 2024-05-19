@@ -10,6 +10,7 @@ kubectl = "latest"
 CONTAINER_ENGINE="docker"
 CACHE_DIR="{{ [config_root, '.cache'] | join_path }}"
 DATA_DIR="{{ [env.CACHE_DIR, 'data'] | join_path }}"
+PKI_DIR="{{ [env.CACHE_DIR, 'pki'] | join_path }}"
 K0SCTL_USERNAME="admin"
 K0SCTL_IDENTITY_PATH="{{ [config_root, '.ssh', 'id_rsa'] | join_path }}"
 K0SCTL_BASE_CONFIG_PATH="{{ [config_root, 'k0s', 'k0s.Cluster.yaml'] | join_path }}"
@@ -35,6 +36,16 @@ K0S_INITRAMFS_OUTPUT="{{ [env.PXE_COREOS_DIR, 'k0s-live-initramfs.img'] | join_p
 K0S_ROOTFS_OUTPUT="{{ [env.PXE_COREOS_DIR, 'k0s-live-rootfs.img'] | join_path }}"
 PXE_IGNITION_PATH="{{ [env.CACHE_DIR, 'ignition', 'pxe.ign'] | join_path }}"
 PXE_BUTANE_PATH="{{ [config_root, 'ignition', 'pxe.bu'] | join_path }}"
+
+[tasks."k0s:trust-ca"]
+run = """
+    #! /usr/bin/env bash
+    mkdir -p ${PKI_DIR}
+
+    kubectl get secret ca-root -n cert-manager -o jsonpath='{ .data.ca\\.crt }' | base64 -d > "${PKI_DIR}/k0s-root-ca.pem"
+    sudo cp "${PKI_DIR}/k0s-root-ca.pem" /usr/share/pki/ca-trust-source/anchors
+    sudo update-ca-trust
+"""
 
 [tasks."k0s:apply"]
 run = "k0sctl apply -c ${K0SCTL_CONFIG_OUTPUT}"

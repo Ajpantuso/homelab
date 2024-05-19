@@ -1,9 +1,11 @@
 # TODO
 
-- Secure Grafana and Prometheus (TLS + passwords)
-- Add persistence for grafana and prometheus
+## Parking Lot
+
 - Add PVC backups
+  - Depends on high speed NAS
 - Add replicated storage (See [Replicated Storage Poc](docs/replicated-storage-poc.md))
+  - Depends on control plane migration
 
 ## Architecture
 
