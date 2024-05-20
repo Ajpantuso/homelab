@@ -152,7 +152,7 @@ depends = ["common:pre-gen:ignition"]
 run = """
     mkdir -p ${DATA_DIR}
     cp ${K0SCTL_IDENTITY_PATH}.pub ${DATA_DIR}/labadm.pub
-    cp -R ignition/overlays/ ${DATA_DIR}
+    cp -R overlays/ ${DATA_DIR}
 
     ${CONTAINER_ENGINE} build -q -t ipxe -f - << EOF
         FROM registry.fedoraproject.org/fedora

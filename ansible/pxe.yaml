@@ -1,6 +1,6 @@
 ---
 - gather_facts: true
-  hosts: k0s
+  hosts: pxe
   roles:
   - role: common
-  - role: k0s-node
+  - role: pxe-node
