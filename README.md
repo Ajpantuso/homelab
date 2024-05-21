@@ -1,14 +1,14 @@
 # TODO
 
-- Containerize image/artifact builders
+- Test containerized arm-installer
 - Prepare Fedora IPXE installer with kickstart for virtual layer
-- Investigate flash NAS with ZFS pool
+- Add PVC backups
+  - https://github.com/vmware-tanzu/helm-charts/tree/main/charts/velero
+  - https://github.com/minio/minio
+  - https://velero.io/docs/main/contributions/minio/
 
 ## Parking Lot
 
-- Add PVC backups
-  - https://github.com/vmware-tanzu/helm-charts/tree/main/charts/velero
-  - Depends on high speed NAS
 - Add replicated storage (See [Replicated Storage Poc](docs/replicated-storage-poc.md))
   - Depends on control plane migration
 

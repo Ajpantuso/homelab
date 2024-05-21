@@ -113,6 +113,27 @@ run = """
     """
 depends = ["k0s:generate:ignition"]
 
+[tasks."pxe:arm:install"]
+run = """
+    ${CONTAINER_ENGINE} build -q -t arm-installer -f - "${root}" << EOF
+        FROM quay.io/coreos/coreos-installer
+
+        RUN dnf install -y cpio rsync jq
+
+        COPY ./scripts/arm_installer_entrypoint.sh entrypoint.sh
+        COPY ./.cache/ignition/pxe.ign config.ign
+
+        ENV RELEASE=40
+        ENV STREAM=stable
+        ENV DEVICE=/dev/sda
+
+        ENTRYPOINT ["./entrypoint.sh"]
+EOF
+
+    ${CONTAINER_ENGINE} run --rm /dev/sda arm-installer
+"""
+depends = ["k0s:generate:ignition"]
+
 [tasks."k0s:generate:iso"]
 run = """
     coreos-installer iso customize \
@@ -154,7 +175,7 @@ run = """
     cp ${K0SCTL_IDENTITY_PATH}.pub ${DATA_DIR}/labadm.pub
     cp -R overlays/ ${DATA_DIR}
 
-    ${CONTAINER_ENGINE} build -q -t ipxe -f - << EOF
+    ${CONTAINER_ENGINE} build -q -t ipxe -f - "${root}" << EOF
         FROM registry.fedoraproject.org/fedora
         RUN dnf install -y ipxe-bootimgs-x86 ipxe-bootimgs-aarch64
         VOLUME /out
