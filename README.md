@@ -1,6 +1,5 @@
 # TODO
 
-- Test containerized arm-installer
 - Prepare Fedora IPXE installer with kickstart for virtual layer
 - Add PVC backups
   - https://github.com/vmware-tanzu/helm-charts/tree/main/charts/velero

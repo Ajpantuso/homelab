@@ -36,6 +36,8 @@ K0S_INITRAMFS_OUTPUT="{{ [env.PXE_COREOS_DIR, 'k0s-live-initramfs.img'] | join_p
 K0S_ROOTFS_OUTPUT="{{ [env.PXE_COREOS_DIR, 'k0s-live-rootfs.img'] | join_path }}"
 PXE_IGNITION_PATH="{{ [env.CACHE_DIR, 'ignition', 'pxe.ign'] | join_path }}"
 PXE_BUTANE_PATH="{{ [config_root, 'ignition', 'pxe.bu'] | join_path }}"
+PXE_ARM_INSTALL_RELEASE="40"
+PXE_ARM_INSTALL_DEVICE="/dev/sda"
 
 [tasks."k0s:trust-ca"]
 run = """
@@ -89,6 +91,8 @@ depends = [ "k0s:generate:pxe" ]
 run = """
     #!/usr/bin/env bash
 
+    mkdir -p ${PXE_COREOS_DIR}
+
     curl -o ${K0S_KERNEL_OUTPUT} ${COREOS_KERNEL_URL}
     curl -o ${K0S_ROOTFS_OUTPUT} ${COREOS_ROOTFS_URL}
 
@@ -97,7 +101,7 @@ run = """
     fi
 
     curl -o temp.initramfs ${COREOS_INITRAMFS_URL}
-    mkdir -p ${PXE_COREOS_DIR}
+
     coreos-installer pxe customize \
         --dest-device ${COREOS_DEST_DEV} \
         --dest-ignition ${K0S_IGNITION_PATH} \
@@ -107,30 +111,48 @@ run = """
 
     chmod 0644 ${K0S_INITRAMFS_OUTPUT}
 
-    tar -C $(dirname ${PXE_ROOT_DIR}) -czf ${PXE_ROOT_DIR}.tar.gz $(basename ${PXE_ROOT_DIR})
-
     rm temp.initramfs
     """
 depends = ["k0s:generate:ignition"]
 
 [tasks."pxe:arm:install"]
 run = """
-    ${CONTAINER_ENGINE} build -q -t arm-installer -f - "${root}" << EOF
-        FROM quay.io/coreos/coreos-installer
+    sudo env PATH="${PATH}" coreos-installer install \
+        -a aarch64 -s stable \
+        -i ./.cache/ignition/pxe.ign \
+        --append-karg nomodeset "${PXE_ARM_INSTALL_DEVICE}"
 
-        RUN dnf install -y cpio rsync jq
+    tmp="$(mktemp -d)"
+    mkdir -p "${tmp}/boot/efi/"
 
-        COPY ./scripts/arm_installer_entrypoint.sh entrypoint.sh
-        COPY ./.cache/ignition/pxe.ign config.ign
+    sudo dnf install -y \
+        --downloadonly \
+        --forcearch=aarch64 \
+        --release="${PXE_ARM_INSTALL_RELEASE}" \
+        --destdir="${tmp}" \
+        uboot-images-armv8 bcm283x-firmware bcm283x-overlays
 
-        ENV RELEASE=40
-        ENV STREAM=stable
-        ENV DEVICE=/dev/sda
+    for rpm in "${tmp}"/*rpm; do
+        rpm2cpio "${rpm}" | cpio -idv -D "${tmp}"
+    done
 
-        ENTRYPOINT ["./entrypoint.sh"]
-EOF
+    mv "${tmp}/usr/share/uboot/rpi_arm64/u-boot.bin" \
+        "${tmp}/boot/efi/rpi-u-boot.bin"
 
-    ${CONTAINER_ENGINE} run --rm /dev/sda arm-installer
+    part=$( \
+        lsblk "${PXE_ARM_INSTALL_DEVICE}" -J -oLABEL,PATH  | \
+        jq -r '.blockdevices[] | select(.label == "EFI-SYSTEM")'.path \
+    )
+
+    mnt="$(mktemp -d)"
+
+    mkdir "${mnt}"
+    sudo mount "${part}" "${mnt}"
+    sudo rsync -avh --ignore-existing "${tmp}/boot/efi/" "${mnt}"
+    sudo umount "${part}"
+
+    rm -rf ${tmp}
+    rm -rf ${mnt}
 """
 depends = ["k0s:generate:ignition"]
 
