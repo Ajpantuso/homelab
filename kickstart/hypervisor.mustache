@@ -1,0 +1,44 @@
+# Set install mode
+cmdline
+
+# Prepare Install Device
+bootloader --driveorder="{{{install_device}}}"
+clearpart --drives="{{{install_device}}}" --all
+zerombr
+autopart
+
+# Localization
+keyboard us
+lang en_US
+timezone America/New_York
+
+# Networking
+network --onboot=yes --bootproto=dhcp
+
+# Configure Users
+rootpw --lock
+user --name=labadm --shell=/usr/bin/bash --groups=wheel --password="{{{labadm_passwd}}}"
+sshkey --username labadm "{{{labadm_key}}}"
+
+# Configure Services
+services --enabled=dnf-automatic.timer
+
+# Configure Packages
+%packages
+@hardware-support
+@virtualization
+
+ansible
+dnf-automatic
+%end
+
+# Post-installation Script
+%post
+install \
+    -o root -g root -m400 \
+    <(echo -e '%wheel\tALL=(ALL)\tNOPASSWD: ALL') \
+    /etc/sudoers.d/01_wheel
+%end
+
+# Reboot After Installation
+reboot --eject

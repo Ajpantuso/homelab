@@ -1,6 +1,7 @@
 # TODO
 
-- Prepare Fedora IPXE installer with kickstart for virtual layer
+- Add additional services to hypervisor install
+- Cleanup `.mise.toml` and use sources/outputs and checksums to avoid unneccessary downloads
 - Add PVC backups
   - https://github.com/vmware-tanzu/helm-charts/tree/main/charts/velero
   - https://github.com/minio/minio
