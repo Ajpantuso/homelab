@@ -127,18 +127,14 @@ run = """
         rm "${K0S_INITRAMFS_OUTPUT}"
     fi
 
-    "${DOWNLOAD_FROM_URL} ${COREOS_INITRAMFS_URL} temp.initramfs"
-
     coreos-installer pxe customize \
         --dest-device "${COREOS_DEST_DEV}" \
         --dest-ignition "${K0S_IGNITION_PATH}" \
         --dest-console ttyS0,115200n8 \
         --dest-console tty0 \
-        -o "${K0S_INITRAMFS_OUTPUT}" temp.initramfs
+        -o "${K0S_INITRAMFS_OUTPUT}" <(curl -sL ${COREOS_INITRAMFS_URL})
 
     chmod 0644 "${K0S_INITRAMFS_OUTPUT}"
-
-    rm temp.initramfs
     """
 depends = ["k0s:generate:ignition"]
 
