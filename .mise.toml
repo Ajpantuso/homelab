@@ -9,19 +9,27 @@ kubectl = "latest"
 "npm:mustache" = "latest"
 
 [env]
+# Tools
 CONTAINER_ENGINE="docker"
+DOWNLOAD_FROM_URL="{{ [config_root, 'hack', 'download_from_url.sh'] | join_path }}"
+
+# Directories
 CACHE_DIR="{{ [config_root, '.cache'] | join_path }}"
 DATA_DIR="{{ [env.CACHE_DIR, 'data'] | join_path }}"
 PKI_DIR="{{ [env.CACHE_DIR, 'pki'] | join_path }}"
+
+# K0SCTL
 K0SCTL_USERNAME="admin"
 K0SCTL_IDENTITY_PATH="{{ [config_root, '.ssh', 'id_rsa'] | join_path }}"
 K0SCTL_BASE_CONFIG_PATH="{{ [config_root, 'k0s', 'k0s.Cluster.yaml'] | join_path }}"
 K0SCTL_CONFIG_OUTPUT="{{ [env.CACHE_DIR, 'k0sctl', 'config.yaml'] | join_path }}"
 K0SCTL_KUBECONFIG="{{ [env.CACHE_DIR, '.kube', 'config'] | join_path }}"
-K0SCTL_HOSTS=""
 KUBECONFIG="{{ env.K0SCTL_KUBECONFIG }}"
+K0SCTL_HOSTS=""
 K0S_BUTANE_PATH="{{ [config_root, 'ignition', 'k0s.bu'] | join_path }}"
 K0S_IGNITION_PATH="{{ [env.CACHE_DIR, 'ignition', 'k0s.ign'] | join_path }}"
+
+# CoreOS image builder
 COREOS_DEST_DEV="/dev/sda"
 COREOS_ISO_PATH=""
 COREOS_ISO_OUTPUT="out.iso"
@@ -31,23 +39,32 @@ COREOS_DOWNLOAD_URL="https://builds.coreos.fedoraproject.org/prod/streams/stable
 COREOS_KERNEL_URL="{{ env.COREOS_DOWNLOAD_URL }}/fedora-coreos-{{ env.COREOS_VERSION }}-live-kernel-{{ env.TARGET_SYSTEM_ARCH }}"
 COREOS_INITRAMFS_URL="{{ env.COREOS_DOWNLOAD_URL }}/fedora-coreos-{{ env.COREOS_VERSION }}-live-initramfs.{{ env.TARGET_SYSTEM_ARCH }}.img"
 COREOS_ROOTFS_URL="{{ env.COREOS_DOWNLOAD_URL }}/fedora-coreos-{{ env.COREOS_VERSION }}-live-rootfs.{{ env.TARGET_SYSTEM_ARCH }}.img"
+
+# Fedora Server image builder
 FEDORA_VERSION="40"
 FEDORA_DOWNLOAD_URL="https://download.fedoraproject.org/pub/fedora/linux/releases/{{ env.FEDORA_VERSION }}/Server/x86_64/os/images/pxeboot"
 FEDORA_KERNEL_URL="{{ env.FEDORA_DOWNLOAD_URL }}/vmlinuz"
 FEDORA_INITRD_URL="{{ env.FEDORA_DOWNLOAD_URL }}/initrd.img"
+
+# ARM image builder
+ARM_INSTALL_RELEASE="40"
+ARM_INSTALL_DEVICE="/dev/sda"
+
+# PXE artifacts
 PXE_ROOT_DIR="{{ [env.DATA_DIR, 'os'] | join_path }}"
 PXE_COREOS_DIR="{{ [env.PXE_ROOT_DIR, 'fedora', 'coreos', env.COREOS_VERSION, env.TARGET_SYSTEM_ARCH] | join_path }}"
 PXE_FEDORA_DIR="{{ [env.PXE_ROOT_DIR, 'fedora', 'server', env.FEDORA_VERSION, env.TARGET_SYSTEM_ARCH] | join_path }}"
-FEDORA_KERNEL_OUTPUT="{{ [env.PXE_FEDORA_DIR, 'vmlinuz'] | join_path }}"
-FEDORA_INITRD_OUTPUT="{{ [env.PXE_FEDORA_DIR, 'initrd.img'] | join_path }}"
 K0S_KERNEL_OUTPUT="{{ [env.PXE_COREOS_DIR, 'k0s-live-kernel'] | join_path }}"
 K0S_INITRAMFS_OUTPUT="{{ [env.PXE_COREOS_DIR, 'k0s-live-initramfs.img'] | join_path }}"
 K0S_ROOTFS_OUTPUT="{{ [env.PXE_COREOS_DIR, 'k0s-live-rootfs.img'] | join_path }}"
+FEDORA_KERNEL_OUTPUT="{{ [env.PXE_FEDORA_DIR, 'vmlinuz'] | join_path }}"
+FEDORA_INITRD_OUTPUT="{{ [env.PXE_FEDORA_DIR, 'initrd.img'] | join_path }}"
 PXE_IGNITION_PATH="{{ [env.CACHE_DIR, 'ignition', 'pxe.ign'] | join_path }}"
 PXE_BUTANE_PATH="{{ [config_root, 'ignition', 'pxe.bu'] | join_path }}"
-PXE_ARM_INSTALL_RELEASE="40"
-PXE_ARM_INSTALL_DEVICE="/dev/sda"
+
+# User Data
 LABADM_PASSWD=""
+LABADM_PUBLIC_KEY=""
 
 [tasks."k0s:trust-ca"]
 run = """
@@ -103,23 +120,23 @@ run = """
 
     mkdir -p ${PXE_COREOS_DIR}
 
-    curl -o ${K0S_KERNEL_OUTPUT} ${COREOS_KERNEL_URL}
-    curl -o ${K0S_ROOTFS_OUTPUT} ${COREOS_ROOTFS_URL}
+    "${DOWNLOAD_FROM_URL}" "${COREOS_KERNEL_URL}" "${K0S_KERNEL_OUTPUT}"
+    "${DOWNLOAD_FROM_URL}" "${COREOS_ROOTFS_URL}" "${K0S_ROOTFS_OUTPUT}"
 
-    if [ -f ${K0S_INITRAMFS_OUTPUT} ]; then
-        rm ${K0S_INITRAMFS_OUTPUT}
+    if [ -f "${K0S_INITRAMFS_OUTPUT}" ]; then
+        rm "${K0S_INITRAMFS_OUTPUT}"
     fi
 
-    curl -o temp.initramfs ${COREOS_INITRAMFS_URL}
+    "${DOWNLOAD_FROM_URL} ${COREOS_INITRAMFS_URL} temp.initramfs"
 
     coreos-installer pxe customize \
-        --dest-device ${COREOS_DEST_DEV} \
-        --dest-ignition ${K0S_IGNITION_PATH} \
+        --dest-device "${COREOS_DEST_DEV}" \
+        --dest-ignition "${K0S_IGNITION_PATH}" \
         --dest-console ttyS0,115200n8 \
         --dest-console tty0 \
-        -o ${K0S_INITRAMFS_OUTPUT} temp.initramfs
+        -o "${K0S_INITRAMFS_OUTPUT}" temp.initramfs
 
-    chmod 0644 ${K0S_INITRAMFS_OUTPUT}
+    chmod 0644 "${K0S_INITRAMFS_OUTPUT}"
 
     rm temp.initramfs
     """
@@ -132,16 +149,15 @@ run = """
     mustache - "${root}/kickstart/hypervisor.mustache" "${PXE_FEDORA_DIR}/hypervisor.ks" << EOF
     {
         "install_device": "/dev/nvme0n1",
-        "labadm_key": "$(/usr/bin/cat ${K0SCTL_IDENTITY_PATH}.pub)",
+        "labadm_key": "$(/usr/bin/cat ${LABADM_PUBLIC_KEY})",
         "labadm_passwd": "${LABADM_PASSWD}"
     }
 EOF
 
     ksvalidator "${PXE_FEDORA_DIR}/hypervisor.ks"
 
-    echo "${FEDORA_KERNEL_URL}"
-    curl -L -o "${FEDORA_KERNEL_OUTPUT}" "${FEDORA_KERNEL_URL}"
-    curl -L -o "${FEDORA_INITRD_OUTPUT}" "${FEDORA_INITRD_URL}"
+    "${DOWNLOAD_FROM_URL}" "${FEDORA_KERNEL_URL}" "${FEDORA_KERNEL_OUTPUT}"
+    "${DOWNLOAD_FROM_URL}" "${FEDORA_INITRD_URL}" "${FEDORA_INITRD_OUTPUT}"
 """
 
 [tasks."pxe:arm:install"]
@@ -149,7 +165,7 @@ run = """
     sudo env PATH="${PATH}" coreos-installer install \
         -a aarch64 -s stable \
         -i ./.cache/ignition/pxe.ign \
-        --append-karg nomodeset "${PXE_ARM_INSTALL_DEVICE}"
+        --append-karg nomodeset "${ARM_INSTALL_DEVICE}"
 
     tmp="$(mktemp -d)"
     mkdir -p "${tmp}/boot/efi/"
@@ -157,7 +173,7 @@ run = """
     sudo dnf install -y \
         --downloadonly \
         --forcearch=aarch64 \
-        --release="${PXE_ARM_INSTALL_RELEASE}" \
+        --release="${ARM_INSTALL_RELEASE}" \
         --destdir="${tmp}" \
         uboot-images-armv8 bcm283x-firmware bcm283x-overlays
 
@@ -169,7 +185,7 @@ run = """
         "${tmp}/boot/efi/rpi-u-boot.bin"
 
     part=$( \
-        lsblk "${PXE_ARM_INSTALL_DEVICE}" -J -oLABEL,PATH  | \
+        lsblk "${ARM_INSTALL_DEVICE}" -J -oLABEL,PATH  | \
         jq -r '.blockdevices[] | select(.label == "EFI-SYSTEM")'.path \
     )
 
@@ -223,7 +239,7 @@ depends = ["common:pre-gen:ignition"]
 [tasks."common:pre-gen:ignition"]
 run = """
     mkdir -p ${DATA_DIR}
-    cp ${K0SCTL_IDENTITY_PATH}.pub ${DATA_DIR}/labadm.pub
+    cp ${LABADM_PUBLIC_KEY} ${DATA_DIR}/labadm.pub
     cp -R overlays/ ${DATA_DIR}
 
     ${CONTAINER_ENGINE} build -q -t ipxe -f - "${root}" << EOF

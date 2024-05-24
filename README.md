@@ -1,11 +1,16 @@
 # TODO
 
-- Add additional services to hypervisor install
 - Cleanup `.mise.toml` and use sources/outputs and checksums to avoid unneccessary downloads
+- Should verify signatures and checksums wherever possible
+- Should record download timestamps and compare against last-modified header
+- Should add local tmp dir
+- Add ansible role for hypervisors
 - Add PVC backups
   - https://github.com/vmware-tanzu/helm-charts/tree/main/charts/velero
   - https://github.com/minio/minio
   - https://velero.io/docs/main/contributions/minio/
+- Setup ssh CA and certificates
+- Automate DHCP/DNS management
 
 ## Parking Lot
 
@@ -25,3 +30,5 @@
 - https://github.com/intel/intel-device-plugins-for-kubernetes/tree/main/cmd/gpu_plugin#testing-and-demos
 - https://github.com/boliu83/ipxe-boot-server
 - https://meshcentral.com/docs/MeshCentral2UserGuide.pdf
+- https://bash-prompt.net/guides/ssh-certificates/
+- https://docs.opnsense.org/development/api.html
