@@ -1,6 +1,7 @@
 # TODO
 
 - Cleanup `.mise.toml` and use sources/outputs and checksums to avoid unneccessary downloads
+- Migrate ansible-pull to homelab-infra
 - Should verify signatures and checksums wherever possible
 - Should record download timestamps and compare against last-modified header
 - Should add local tmp dir

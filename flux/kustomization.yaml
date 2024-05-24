@@ -4,6 +4,5 @@ namespace: flux-system
 resources:
 - homelab.gitrepository.yaml
 - metallb.kustomization.yaml
-- meshcentral.kustomization.yaml
 - monitoring.kustomization.yaml
 - cert-manager.kustomization.yaml
