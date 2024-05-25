@@ -1,3 +1,0 @@
----
-- ansible.builtin.import_playbook: k0s.yaml
-- ansible.builtin.import_playbook: pxe.yaml
