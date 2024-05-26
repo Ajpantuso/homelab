@@ -1,6 +1,5 @@
 # TODO
 
-- Cleanup `.mise.toml` and use sources/outputs and checksums to avoid unneccessary downloads
 - Should verify signatures and checksums wherever possible
 - Should record download timestamps and compare against last-modified header
 - Should add local tmp dir
@@ -11,6 +10,7 @@
   - https://velero.io/docs/main/contributions/minio/
 - Setup ssh CA and certificates
 - Automate DHCP/DNS management
+- Play around with WASM and SpinKube https://www.spinkube.dev/
 
 ## Parking Lot
 
@@ -32,3 +32,4 @@
 - https://meshcentral.com/docs/MeshCentral2UserGuide.pdf
 - https://bash-prompt.net/guides/ssh-certificates/
 - https://docs.opnsense.org/development/api.html
+- https://github.com/ProjectPhysX/OpenCL-Benchmark
