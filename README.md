@@ -3,6 +3,9 @@
 - Should verify signatures and checksums wherever possible
 - Should record download timestamps and compare against last-modified header
 - Should add local tmp dir
+- Add Gitea Helm Chart https://about.gitea.com/ (Move this to infra later)
+- Try out Tekton https://tekton.dev/docs/ and integrate with Gitea (to replace flux)
+- Decide if VM's should run directly on hypervisor or if hypervisors should run kube + kubevirt
 - Add ansible role for hypervisors
 - Add PVC backups
   - https://github.com/vmware-tanzu/helm-charts/tree/main/charts/velero

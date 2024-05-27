@@ -25,6 +25,8 @@ spec:
               url: https://fluxcd-community.github.io/helm-charts
             - name: prometheus-community
               url: https://prometheus-community.github.io/helm-charts
+            - name: gitea-charts
+              url: https://dl.gitea.com/charts/
             charts:
             - name: openebs
               chartname: openebs-internal/openebs
@@ -72,9 +74,13 @@ spec:
               namespace: inteldeviceplugins-system
               values: |
                 nodeFeatureRule: true
+            - name: gitea
+              chartname: gitea-charts/gitea
+              order: 9
+              namespace: gitea
             - name: kube-prometheus-stack
               chartname: prometheus-community/kube-prometheus-stack
-              order: 9
+              order: 10
               namespace: monitoring
               values: |
                 alertmanager:
