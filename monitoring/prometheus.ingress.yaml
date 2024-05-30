@@ -7,7 +7,7 @@ metadata:
 spec:
   tls:
   - hosts:
-    - prometheus.ajphome.com.
+    - prometheus.ajphome.com
     secretName: prometheus-tls
   rules:
   - host: prometheus.ajphome.com
