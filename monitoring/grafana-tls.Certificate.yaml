@@ -3,6 +3,13 @@ kind: Certificate
 metadata:
   name: grafana-tls
 spec:
+  duration: 2160h # 90d
+  renewBefore: 360h # 15d
+  subject:
+    organizations:
+      - AJP
+  commonName: grafana.ajphome.com
+  isCA: false
   dnsNames:
   - grafana.ajphome.com
   secretName: grafana-tls
