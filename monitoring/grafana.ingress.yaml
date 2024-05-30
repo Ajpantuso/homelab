@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: grafana.ajphome.com.
+spec:
+  tls:
+  - hosts:
+    - grafana.ajphome.com.
+    secretName: grafana-tls
+  rules:
+  - host: grafana.ajphome.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: kube-prometheus-stack-grafana
+            port:
+              number: 80

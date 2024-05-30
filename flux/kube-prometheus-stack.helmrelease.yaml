@@ -1,0 +1,41 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: kube-prometheus-stack
+spec:
+  targetNamespace: monitoring
+  install:
+    createNamespace: true
+  chart:
+    spec:
+      chart: kube-prometheus-stack
+      version: "*"
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+  interval: 10m0s
+  values: |
+    alertmanager:
+      enabled: false
+    grafana:
+      persistence:
+        enabled: true
+        type: sts
+        storageClassName: "openebs-hostpath"
+        accessModes:
+        - ReadWriteOnce
+        size: 20Gi
+        finalizers:
+        - kubernetes.io/pvc-protection
+    prometheus:
+      prometheusSpec:
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: "openebs-hostpath"
+              accessModes:
+              - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 50Gi
+            selector: {}
