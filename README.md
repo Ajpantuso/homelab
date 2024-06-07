@@ -1,15 +1,10 @@
 # TODO
 
-- Should verify signatures and checksums wherever possible
-- Should record download timestamps and compare against last-modified header
-- Should add local tmp dir
-- Decide if VM's should run directly on hypervisor or if hypervisors should run kube + kubevirt
 - Add ansible role for hypervisors
 - Add PVC backups
   - https://github.com/vmware-tanzu/helm-charts/tree/main/charts/velero
   - https://github.com/minio/minio
   - https://velero.io/docs/main/contributions/minio/
-- Setup ssh CA and certificates
 - Play around with WASM and SpinKube https://www.spinkube.dev/
 
 ## Parking Lot
@@ -19,7 +14,7 @@
 
 ## Architecture
 
-![homelab_architecture](docs/assets/homelab_high-level_architecture.png)
+![homelab_architecture](docs/assets/homelab_arch.png)
 
 ## References
 
