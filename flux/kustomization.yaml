@@ -23,3 +23,7 @@ resources:
 - kube-prometheus-stack.helmrelease.yaml
 - bitnami.helmrepository.yaml
 - external-dns.helmrelease.yaml
+- kwasm.helmrepository.yaml
+- kwasm.helmrelease.yaml
+- spinkube.helmrepository.yaml
+- spin-operator.helmrelease.yaml

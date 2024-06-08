@@ -1,0 +1,19 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: kwasm
+spec:
+  targetNamespace: kwasm-operator
+  install:
+    createNamespace: true
+  chart:
+    spec:
+      chart: kwasm-operator
+      version: 0.2.*
+      sourceRef:
+        kind: HelmRepository
+        name: kwasm
+  interval: 10m0s
+  values:
+    kwasmOperator:
+      installerImage: ghcr.io/spinkube/containerd-shim-spin/node-installer:v0.14.1
