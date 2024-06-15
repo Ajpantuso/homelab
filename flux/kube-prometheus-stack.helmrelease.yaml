@@ -14,7 +14,7 @@ spec:
         kind: HelmRepository
         name: prometheus-community
   interval: 10m0s
-  values: |
+  values:
     alertmanager:
       enabled: false
     grafana:

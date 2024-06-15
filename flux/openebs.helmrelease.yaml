@@ -9,13 +9,13 @@ spec:
   chart:
     spec:
       chart: openebs
-      version: 3.9.*
+      version: 4.0.*
       sourceRef:
         kind: HelmRepository
         name: openebs
   interval: 10m0s
   values:
-    localprovisioner:
-      hostpathClass:
-        enabled: true
-        isDefaultClass: true
+    engines:
+      replicated:
+        mayastor:
+          enabled: false
