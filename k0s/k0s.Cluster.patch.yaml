@@ -6,6 +6,11 @@ spec:
   k0s:
     config:
       spec:
+        api:
+          address: 10.0.0.200
+          externalAddress: homelab.ajphome.com
+          sans:
+          - 10.0.0.200
         extensions:
           helm:
             repositories:

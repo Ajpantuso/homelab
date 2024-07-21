@@ -42,12 +42,12 @@ spec:
         valueFrom:
           configMapKeyRef:
             name: opnsense
-            key: allow_invalid_certs
+            key: allowInvalidCerts
       - name: OPNSENSE_DOMAIN_FILTERS
         valueFrom:
           configMapKeyRef:
             name: opnsense
-            key: domain_filters
+            key: domainFilters
       - name: OPNSENSE_KEY
         valueFrom:
           secretKeyRef:
