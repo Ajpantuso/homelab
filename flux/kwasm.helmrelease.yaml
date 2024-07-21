@@ -16,4 +16,4 @@ spec:
   interval: 10m0s
   values:
     kwasmOperator:
-      installerImage: ghcr.io/spinkube/containerd-shim-spin/node-installer:v0.14.1
+      installerImage: ghcr.io/spinkube/containerd-shim-spin/node-installer:v0.15.1
